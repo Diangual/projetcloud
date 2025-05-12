@@ -21,13 +21,13 @@ jobs:
 
       # Install Trivy
       - name: Install Trivy
-        uses: aquasecurity/trivy-action@0.14.0
-        with:
-          scan-type: 'fs'
-          scan-ref: '.'
-          skip-files: '**/test/**,**/examples/**'
-          exit-code: '1'
-          cache-dir: '.trivycache'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y wget apt-transport-https gnupg lsb-release
+          wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | sudo apt-key add -
+          echo deb https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main | sudo tee -a /etc/apt/sources.list.d/trivy.list
+          sudo apt-get update
+          sudo apt-get install -y trivy
 
       # Run Trivy scan (config + sensitive)
       - name: Scan Terraform files
