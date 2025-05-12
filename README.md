@@ -1,5 +1,3 @@
-
-```markdow
 # Terraform Kubernetes Cluster Module 🚀
 
 [![Trivy Security Scan](https://github.com/Diangual/projetcloud/actions/workflows/trivy-scan.yml/badge.svg)](https://github.com/Diangual/projetcloud/actions/workflows/trivy-scan.yml)
@@ -23,7 +21,7 @@ Un module Terraform modulaire pour déployer des clusters Kubernetes (EKS) avec 
 - **Documentation auto-générée** via `terraform-docs`
 
 ## 📦 Structure du Module
-
+```markdow
 
 │   .gitattributes
 │   .gitignore
