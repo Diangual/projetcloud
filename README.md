@@ -24,7 +24,7 @@ Un module Terraform modulaire pour déployer des clusters Kubernetes (EKS) avec 
 
 ## 📦 Structure du Module
 
-```
+
 │   .gitattributes
 │   .gitignore
 │   .pre-commit-config.yaml
