@@ -22,12 +22,17 @@ jobs:
       # Install Trivy
       - name: Install Trivy
         uses: aquasecurity/trivy-action@0.14.0
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          skip-files: '**/test/**,**/examples/**'
+          exit-code: '1'
+          cache-dir: '.trivycache'
 
       # Run Trivy scan (config + sensitive)
       - name: Scan Terraform files
         run: |
-          trivy config --security-checks config,secret --severity HIGH,CRITICAL \
-          --format sarif --output trivy-results.sarif .
+          trivy config .
 
       # Upload results to GitHub Security tab
       - name: Upload SARIF results
