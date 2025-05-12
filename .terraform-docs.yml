@@ -1,0 +1,14 @@
+formatter: "markdown table"
+
+output:
+  file: "README.md"
+  mode: inject
+
+sections:
+  hide:
+    - resources
+
+settings:
+  anchor: true
+  color: true
+  indent: 2

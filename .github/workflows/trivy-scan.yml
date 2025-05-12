@@ -1,0 +1,45 @@
+name: Trivy Security Scan
+on:
+  pull_request:
+    branches: [ "main" ]
+  push:
+    branches: [ "main" ]
+  schedule:
+    - cron: '0 0 * * *'  # Daily scan
+
+jobs:
+  trivy-scan:
+    name: Run Trivy Scanner
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write  # For GitHub Code Scanning alerts
+
+    steps:
+      # Checkout code
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Install Trivy
+      - name: Install Trivy
+        uses: aquasecurity/trivy-action@0.14.0
+
+      # Run Trivy scan (config + sensitive)
+      - name: Scan Terraform files
+        run: |
+          trivy config --security-checks config,secret --severity HIGH,CRITICAL \
+          --format sarif --output trivy-results.sarif .
+
+      # Upload results to GitHub Security tab
+      - name: Upload SARIF results
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: trivy-results.sarif
+
+      # Fail workflow on critical findings
+      - name: Check for critical vulnerabilities
+        if: success()
+        run: |
+          if grep -q '"level": "error"' trivy-results.sarif; then
+            echo "::error::Critical vulnerabilities found!"
+            exit 1
+          fi

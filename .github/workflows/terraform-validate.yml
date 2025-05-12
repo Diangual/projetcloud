@@ -1,0 +1,69 @@
+name: Terraform Validate
+on:
+  pull_request:
+    branches: [ "main" ]
+  push:
+    branches: [ "main" ]
+
+jobs:
+  validate:
+    name: Validate Terraform
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: examples/basic-eks
+
+    steps:
+      # 1. Checkout code
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. Install Terraform
+      - name: Install Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.11.4"
+
+      # 3. Initialize Terraform
+      - name: Terraform Init
+        id: init
+        run: terraform init -backend=false
+
+      # 4. Validate configurations
+      - name: Terraform Validate
+        id: validate
+        run: terraform validate
+
+      # 5. Check formatting
+      - name: Terraform Format
+        id: fmt
+        run: |
+          terraform fmt -check -recursive
+          echo "::set-output name=diff::$(terraform fmt -write=false -recursive || true)"
+
+      # 6. Run tflint
+      - name: TFLint
+        uses: terraform-linters/setup-tflint@v3
+        with:
+          tflint_version: "v0.48.0"
+        env:
+          AWS_REGION: "us-east-1"
+      - run: tflint --init
+      - run: tflint --force
+
+      # 7. Post results
+      - name: Comment PR with Plan
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const output = `Terraform Validation Results:
+            ✅ Init: ${{ steps.init.outcome }}
+            ✅ Validate: ${{ steps.validate.outcome }}
+            ✅ Format: ${{ steps.fmt.outcome }}`;
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: output
+            })
