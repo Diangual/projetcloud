@@ -22,8 +22,6 @@ jobs:
       # Install Trivy
       - name: Install Trivy
         uses: aquasecurity/trivy-action@0.14.0
-        with:
-          trivy-version: '0.48.0'
 
       # Run Trivy scan (config + sensitive)
       - name: Scan Terraform files
